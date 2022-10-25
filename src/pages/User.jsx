@@ -4,19 +4,24 @@ import GithubContext from '../context/github/GithubContext';
 import {FaCodepen, FaStore, FaUserFriends, FaUsers} from 'react-icons/fa';
 import {Link} from 'react-router-dom';
 import Spinner from '../components/layout/Spinner';
-import { html } from 'daisyui/dist/base';
 import RepoList from '../components/repos/ReposList';
+import {getUserAndRepos} from '../context/github/GithubActions';
 
 function User() {
-    const {getUser, user, loading, getUserRepos, repos} = useContext(GithubContext);
+    const {repos, user, loading, dispatch} = useContext(GithubContext);
 
     const params = useParams();
     
     useEffect(() =>{
-        getUser(params.login)
-        getUserRepos(params.login)
-        // esling-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        dispatch({type: 'SET_LOADING'})
+        const getUserData = async() => {
+            const userData = await getUserAndRepos(params.login)
+            dispatch({type: 'GET_USER_AND_REPOS', payload: userData})
+
+        }
+
+        getUserData();
+    }, [dispatch, params.login]);
 
     const {
         name,
@@ -42,7 +47,7 @@ function User() {
         <>
             <div className="w-full mx-auto lg:w-10/12">
                 <div className="mb-4">
-                    <Link className="btn btn-ghost">Back to search</Link>
+                    <Link to="/" className="btn btn-ghost">Back to search</Link>
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-3 mb-8 md:gap-8">
